@@ -1,18 +1,40 @@
 <template>
   <div id="app">
     <b-card class="mx-auto w-50" title="Domains">
-      <b-form @submit="addItem()">
-        <b-input-group prepend="New domain:" class="mt-3">
+      <b-form
+          @submit="addManyItems"
+      >
+        <b-input-group>
+          <b-form-textarea
+              required
+              id="textarea"
+              v-model="newDomainsString"
+              placeholder="Enter domains, one per row..."
+              rows="3"
+          ></b-form-textarea>
+          <b-input-group-append>
+            <b-button variant="outline-success" type="submit"
+            >Add many
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+
+      <b-form @submit="addItem" class="my-2">
+        <b-input-group prepend="Add domain:" class="mt-3">
           <b-form-input v-model="newDomain" placeholder="example.com" required></b-form-input>
           <b-input-group-append>
             <b-button type="submit" variant="outline-success"
-            >Save
+            >Add
             </b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form>
       <b-table
           small
+          sticky-header="true"
+          head-variant="dark"
+          :busy="!getTableRows"
           :fields="getTableFields"
           :items="getTableRows"
           striped
@@ -22,9 +44,9 @@
           <b-button size="sm" @click="deleteItem(row.item.id)" variant="outline-danger" class="mr-2">
             Delete
           </b-button>
-          <b-button size="sm" variant="outline-secondary" class="mr-2">
-            Edit
-          </b-button>
+<!--          <b-button size="sm" variant="outline-secondary" class="mr-2">-->
+<!--            Edit-->
+<!--          </b-button>-->
         </template>
       </b-table>
     </b-card>
@@ -42,6 +64,11 @@ import axios from 'axios';
 export default class App extends Vue {
   private newDomain: string | null = null;
   private domains: Array<string> = [];
+  private newDomainsString = '';
+
+  get getDomainsToSave(): Array<string> {
+    return this.newDomainsString.split('\n');
+  }
 
   get getDomains() {
     return this.domains;
@@ -79,6 +106,19 @@ export default class App extends Vue {
     })
         .then(() => {
           this.getDomainsFromServer()
+        })
+  }
+
+  private async addManyItems(e) {
+    e.preventDefault();
+    console.log(`Add many items`)
+    await axios.post('http://localhost:3000/addmany/', {
+      data: {
+        hosts: this.getDomainsToSave
+      }
+    })
+        .then(() => {
+          this.getDomainsFromServer();
         })
   }
 
