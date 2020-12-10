@@ -1,6 +1,16 @@
 <template>
   <div id="app">
     <b-card class="mx-auto w-50" title="Domains">
+      <b-form @submit="addItem()">
+        <b-input-group prepend="New domain:" class="mt-3">
+          <b-form-input v-model="newDomain" placeholder="example.com" required></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit" variant="outline-success"
+            >Save
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
       <b-table
           small
           :fields="getTableFields"
@@ -30,7 +40,7 @@ import axios from 'axios';
   components: {},
 })
 export default class App extends Vue {
-
+  private newDomain: string | null = null;
   private domains: Array<string> = [];
 
   get getDomains() {
@@ -59,6 +69,17 @@ export default class App extends Vue {
         id: domain._id
       }
     })
+  }
+
+  private async addItem() {
+    await axios.post('http://localhost:3000/addone/', {
+      data: {
+        host: this.newDomain
+      }
+    })
+        .then(() => {
+          this.getDomainsFromServer()
+        })
   }
 
   private async deleteItem(id) {
