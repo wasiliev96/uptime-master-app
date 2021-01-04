@@ -150,7 +150,7 @@ export default class App extends Vue {
         })
   }
 
-  private async addManyItems(e) {
+  private async addManyItems(e: any) {
     e.preventDefault();
     console.log(`Add many items`)
     if (this.getDomainsToSave[0].length >= 5 && !this.getDomainsToSave.find((domain) => {
@@ -176,7 +176,7 @@ export default class App extends Vue {
     }
   }
 
-  private async deleteItem(id) {
+  private async deleteItem(id: any) {
     this.loading = true;
     console.log(`DeleteItem`)
     console.log(id)
@@ -187,7 +187,7 @@ export default class App extends Vue {
     })
         .then(response => {
           console.log(response)
-          this.domains = this.domains.filter(domain => domain._id != id);
+          this.domains = this.domains.filter((domain: any) => domain._id != id);
           console.log(`Done!`)
         })
         .then(() => {
@@ -208,7 +208,7 @@ export default class App extends Vue {
   }
 
   private makeToast(variant = 'info', text = '') {
-    this.toastCount++
+    //@ts-ignore
     this.$bvToast.toast(text, {
       title: 'Notify',
       variant: variant,
@@ -271,10 +271,6 @@ html, body {
   z-index:          2;
 }
 
-.table tr:hover {
-  //box-shadow: inset 0 0 5px 2px #DC3545;
-
-}
 
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
   button {
