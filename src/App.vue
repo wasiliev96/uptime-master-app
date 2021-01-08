@@ -3,22 +3,22 @@
     <b-modal v-model="showAuthModal" hide-footer>
       <b-form @submit="auth" ref="auth" @submit.prevent="auth">
         <b-form-group
-          id="input-group-1"
-          label-for="input-1"
-          description="We'll never share your email with anyone else."
+            id="input-group-1"
+            label-for="input-1"
+            description="We'll never share your email with anyone else."
         >
           <b-form-input
-            id="username"
-            v-model="credentials.username"
-            type="text"
-            placeholder="Enter username"
-            required
+              id="username"
+              v-model="credentials.username"
+              type="text"
+              placeholder="Enter username"
+              required
           ></b-form-input>
           <b-form-input
-            id="username"
-            v-model="credentials.password"
-            type="password"
-            required
+              id="username"
+              v-model="credentials.password"
+              type="password"
+              required
           ></b-form-input>
         </b-form-group>
         <b-button variant="primary" type="submit" :disabled="loading">
@@ -36,12 +36,12 @@
       <b-form @submit="addManyItems">
         <b-input-group>
           <b-form-textarea
-            required
-            id="textarea"
-            v-model="newDomainsString"
-            placeholder="Enter domains, one per row..."
-            rows="3"
-            max-rows="20"
+              required
+              id="textarea"
+              v-model="newDomainsString"
+              placeholder="Enter domains, one per row..."
+              rows="3"
+              max-rows="20"
           >
           </b-form-textarea>
           <b-input-group-append>
@@ -69,34 +69,34 @@
     <b-container class="pb-5">
       <b-row>
         <b-col
-          cols="12"
-          lg="10"
-          style="max-width:1200px; height: 85vh; overflow-y:auto;"
-          class="mx-auto "
+            cols="12"
+            lg="10"
+            style="max-width:1200px; height: 85vh; overflow-y:auto;"
+            class="mx-auto "
         >
           <b-table
-            head-variant="light"
-            :busy="!getTableRows.length"
-            :fields="getTableFields"
-            :items="getTableRows"
-            striped
-            hover
+              head-variant="light"
+              :busy="!getTableRows.length"
+              :fields="getTableFields"
+              :items="getTableRows"
+              striped
+              hover
           >
             <template #cell(domain)="row">
               <a
-                :href="`https://${row.item.domain}`"
-                target="_blank"
-                class="text-left d-inline-block"
-                >{{ row.item.domain }}</a
+                  :href="`https://${row.item.domain}`"
+                  target="_blank"
+                  class="text-left d-inline-block"
+              >{{ row.item.domain }}</a
               >
             </template>
             <template #cell(controls)="row">
               <!-- Ping -->
               <b-button
-                size="md"
-                @click="ping(row.item.domain)"
-                class="mr-2"
-                :variant="
+                  size="md"
+                  @click="ping(row.item.domain, row.item.id)"
+                  class="mr-2"
+                  :variant="
                   row.item.status && row.item.status === 200
                     ? 'success'
                     : row.item.status && row.item.status <= 302
@@ -104,24 +104,26 @@
                     : row.item.status && 'danger'
                 "
               >
-                {{ row.item.status ? row.item.status : "&#9992;" }}
+                <span v-if="!row.item.status">{{ '&#9992;' }}</span>
+                <b-spinner small type="grow" v-else-if="row.item.status==='0'"></b-spinner>
+                <span v-else v-text="row.item.status"></span>
               </b-button>
 
               <!-- Delete -->
               <b-button
-                variant="outline-success"
-                class="mr-2"
-                type="submit"
-                v-if="loading"
+                  variant="outline-success"
+                  class="mr-2"
+                  type="submit"
+                  v-if="loading"
               >
                 <b-spinner small type="grow"></b-spinner>
               </b-button>
               <b-button
-                v-else
-                size="md"
-                @click="deleteItem(row.item.id)"
-                variant="outline-danger"
-                class="mr-2"
+                  v-else
+                  size="md"
+                  @click="deleteItem(row.item.id)"
+                  variant="outline-danger"
+                  class="mr-2"
               >
                 &#10761;
               </b-button>
@@ -144,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 
 import axios from "axios";
 
@@ -181,6 +183,7 @@ export default class App extends Vue {
       this.showAuthModal = true;
     }
   }
+
   private logout() {
     localStorage.removeItem("username");
     localStorage.removeItem("password");
@@ -191,6 +194,7 @@ export default class App extends Vue {
     this.showAuthModal = true;
     // window.location.reload();
   }
+
   private loading = false;
   private newDomain: string | null = null;
   private domains: Array<any> = [];
@@ -236,63 +240,63 @@ export default class App extends Vue {
   private async addItem() {
     this.loading = true;
     await axios
-      .post(
-        `${this.baseURL}/addone/`,
-        {
-          data: {
-            host: this.newDomain,
-          },
-        },
-        {
-          auth: {
-            username: this.credentials.username,
-            password: this.credentials.password,
-          },
-        }
-      )
-      .then(() => {
-        this.getDomainsFromServer();
-      })
-      .then(() => {
-        this.loading = false;
-      });
-  }
-
-  private async addManyItems(e: any) {
-    e.preventDefault();
-    console.log(`Add many items`);
-    if (
-      this.getDomainsToSave[0].length >= 5 &&
-      !this.getDomainsToSave.find((domain) => {
-        console.log(domain);
-        return !/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/.test(
-          domain
-        );
-      })
-    ) {
-      this.loading = true;
-      await axios
         .post(
-          `${this.baseURL}/addmany/`,
-          {
-            data: {
-              hosts: this.getDomainsToSave,
+            `${this.baseURL}/addone/`,
+            {
+              data: {
+                host: this.newDomain,
+              },
             },
-          },
-          {
-            auth: {
-              username: this.credentials.username,
-              password: this.credentials.password,
-            },
-          }
+            {
+              auth: {
+                username: this.credentials.username,
+                password: this.credentials.password,
+              },
+            }
         )
         .then(() => {
           this.getDomainsFromServer();
         })
         .then(() => {
           this.loading = false;
-          this.clearDomainsInput();
         });
+  }
+
+  private async addManyItems(e: any) {
+    e.preventDefault();
+    console.log(`Add many items`);
+    if (
+        this.getDomainsToSave[0].length >= 5 &&
+        !this.getDomainsToSave.find((domain) => {
+          console.log(domain);
+          return !/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/.test(
+              domain
+          );
+        })
+    ) {
+      this.loading = true;
+      await axios
+          .post(
+              `${this.baseURL}/addmany/`,
+              {
+                data: {
+                  hosts: this.getDomainsToSave,
+                },
+              },
+              {
+                auth: {
+                  username: this.credentials.username,
+                  password: this.credentials.password,
+                },
+              }
+          )
+          .then(() => {
+            this.getDomainsFromServer();
+          })
+          .then(() => {
+            this.loading = false;
+            this.clearDomainsInput();
+          });
     } else {
       this.makeToast("danger", "wrong input");
       return;
@@ -304,52 +308,52 @@ export default class App extends Vue {
     console.log(`DeleteItem`);
     console.log(id);
     await axios
-      .delete(`${this.baseURL}/deleteone/`, {
-        data: {
-          id: id,
-        },
-        auth: {
-          username: this.credentials.username,
-          password: this.credentials.password,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        this.domains = this.domains.filter((domain: any) => domain._id != id);
-        console.log(`Done!`);
-      })
-      .then(
-        () => {
-          this.loading = false;
-          this.makeToast("success", "domain removed");
-        },
-        () => {
-          this.makeToast("danger", "Error");
-        }
-      );
+        .delete(`${this.baseURL}/deleteone/`, {
+          data: {
+            id: id,
+          },
+          auth: {
+            username: this.credentials.username,
+            password: this.credentials.password,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.domains = this.domains.filter((domain: any) => domain._id != id);
+          console.log(`Done!`);
+        })
+        .then(
+            () => {
+              this.loading = false;
+              this.makeToast("success", "domain removed");
+            },
+            () => {
+              this.makeToast("danger", "Error");
+            }
+        );
   }
 
   private async getDomainsFromServer() {
     this.loading = true;
     await axios
-      .get(`${this.baseURL}/getdomains/`, {
-        auth: {
-          username: this.credentials.username,
-          password: this.credentials.password,
-        },
-      })
-      .then((res: any) => {
-        this.domains = res.data.domains.map((domain: any) => {
-          return { ...domain, status: null };
+        .get(`${this.baseURL}/getdomains/`, {
+          auth: {
+            username: this.credentials.username,
+            password: this.credentials.password,
+          },
+        })
+        .then((res: any) => {
+          this.domains = res.data.domains.map((domain: any) => {
+            return {...domain, status: null};
+          });
+        })
+        .then(() => {
+          console.log(this.domains);
+        })
+        .then(() => {
+          this.loading = false;
+          this.makeToast("success", "Domain successfully gotted from server");
         });
-      })
-      .then(() => {
-        console.log(this.domains);
-      })
-      .then(() => {
-        this.loading = false;
-        this.makeToast("success", "Domain successfully gotted from server");
-      });
   }
 
   private makeToast(variant = "info", text = "") {
@@ -368,53 +372,57 @@ export default class App extends Vue {
       this.credentials.username = localStorage.username;
       this.credentials.password = localStorage.password;
       await axios
-        .get(`${this.baseURL}/getdomains`, {
-          auth: {
-            username: this.credentials.username,
-            password: this.credentials.password,
-          },
-        })
-        .then(() => {
-          this.authorized = true;
-          this.showAuthModal = false;
-        })
-        .then(() => {
-          if (!this.authorized) {
-            this.showAuthModal = true;
-          } else {
-            this.getDomainsFromServer();
-          }
-        });
+          .get(`${this.baseURL}/getdomains`, {
+            auth: {
+              username: this.credentials.username,
+              password: this.credentials.password,
+            },
+          })
+          .then(() => {
+            this.authorized = true;
+            this.showAuthModal = false;
+          })
+          .then(() => {
+            if (!this.authorized) {
+              this.showAuthModal = true;
+            } else {
+              this.getDomainsFromServer();
+            }
+          });
     } else {
       this.authorized = false;
       this.showAuthModal = true;
     }
   }
 
-  async ping(host: string) {
-    console.log(`ping ${host}`);
+  async ping(host: string, id: string) {
+    const domainToChangeIndex = this.domains.findIndex(
+        (domain: any) => domain._id === id
+    );
+    this.domains[domainToChangeIndex].status = '0';
+    console.log(`ping https://${host}`);
     fetch("https://" + host)
-      .then((res) => {
-        console.log(res);
-
-        const domainToChange = this.domains.findIndex(
-          (domain: any) => domain.host === host
-        );
-        if (domainToChange) {
-          this.domains[domainToChange].status = res.status;
-          this.makeToast(
-            res.status === 200
-              ? "success"
-              : res.status <= 302
-              ? "warning"
-              : "danger",
-            `Ping status: ${res.status}`
-          );
-        } else {
-          console.log(`not found domain`);
-        }
-      })
-      .catch((e) => console.log(e));
+        .then((res) => {
+          console.log(res);
+          console.log(domainToChangeIndex)
+          if (domainToChangeIndex >= 0) {
+            this.domains[domainToChangeIndex].status = res.status;
+            this.makeToast(
+                res.status === 200
+                    ? "success"
+                    : res.status <= 302
+                    ? "warning"
+                    : "danger",
+                `Host: ${host}\nPing status: ${res.status}`
+            );
+          } else {
+            console.log(`not found domain`);
+          }
+        })
+        .catch((e) => {
+          this.makeToast('warning', 'Can`t connect. Try to enable CORS(by extension) and VPN')
+          console.log(e);
+        });
   }
 }
 </script>
@@ -426,11 +434,11 @@ body {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  font-family:             Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  text-align:              center;
+  color:                   #2C3E50;
 }
 
 .remove svg {
@@ -438,30 +446,30 @@ body {
 }
 
 .remove:hover svg {
-  fill: darkred;
+  fill:      darkred;
   transform: scale(1.2);
 }
 
 .table {
   td {
-    padding: 0;
+    padding:        0;
     vertical-align: middle;
 
     a {
       font-weight: bold;
-      font-size: 1.2rem;
-      padding: 0.5em 2em;
-      transition: all 0.3s ease-in-out;
+      font-size:   1.2rem;
+      padding:     0.5em 2em;
+      transition:  all 0.3s ease-in-out;
     }
   }
 }
 
 .table.b-table > thead > tr > th {
   background-color: white;
-  position: sticky;
-  position: -webkit-sticky;
-  top: 0;
-  z-index: 2;
+  position:         sticky;
+  position:         -webkit-sticky;
+  top:              0;
+  z-index:          2;
 }
 
 .table-hover tbody tr:hover td,
