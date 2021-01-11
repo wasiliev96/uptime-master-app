@@ -406,7 +406,7 @@ export default class App extends Vue {
           console.log(res);
           console.log(domainToChangeIndex)
           if (domainToChangeIndex >= 0) {
-            this.domains[domainToChangeIndex].status = res.status;
+            this.domains[domainToChangeIndex].status = res.redirected ? '301' : res.status;
             this.makeToast(
                 res.status === 200
                     ? "success"
@@ -434,11 +434,11 @@ body {
 }
 
 #app {
-  font-family:             Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing:  antialiased;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align:              center;
-  color:                   #2C3E50;
+  text-align: center;
+  color: #2C3E50;
 }
 
 .remove svg {
@@ -446,30 +446,30 @@ body {
 }
 
 .remove:hover svg {
-  fill:      darkred;
+  fill: darkred;
   transform: scale(1.2);
 }
 
 .table {
   td {
-    padding:        0;
+    padding: 0;
     vertical-align: middle;
 
     a {
       font-weight: bold;
-      font-size:   1.2rem;
-      padding:     0.5em 2em;
-      transition:  all 0.3s ease-in-out;
+      font-size: 1.2rem;
+      padding: 0.5em 2em;
+      transition: all 0.3s ease-in-out;
     }
   }
 }
 
 .table.b-table > thead > tr > th {
   background-color: white;
-  position:         sticky;
-  position:         -webkit-sticky;
-  top:              0;
-  z-index:          2;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .table-hover tbody tr:hover td,
