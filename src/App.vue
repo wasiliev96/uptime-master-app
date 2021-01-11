@@ -406,7 +406,7 @@ export default class App extends Vue {
           console.log(res);
           console.log(domainToChangeIndex)
           if (domainToChangeIndex >= 0) {
-            this.domains[domainToChangeIndex].status = res.redirected ? '301' : res.status;
+            this.domains[domainToChangeIndex].status = res.redirected ? '302' : res.status;
             this.makeToast(
                 res.status === 200
                     ? "success"
